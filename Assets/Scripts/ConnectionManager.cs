@@ -8,6 +8,7 @@ using System;
 
 public class ConnectionManager : MonoBehaviourPunCallbacks
 {
+    List<RoomInfo> cachedRoomList = new List<RoomInfo>();
 
     void Start()
     {
@@ -32,6 +33,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
             PhotonNetwork.ConnectUsingSettings();
             LobbyUIController.lobbyUI.btn_login.interactable = false;
         }
+        
     }
 
     public override void OnConnected()
@@ -144,4 +146,40 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
         string playerMsg = $"{otherPlayer.NickName}님이 퇴장하셨습니다.";
         LobbyUIController.lobbyUI.PrintLog(playerMsg);
     }
+
+    // 현재 로비에서 룸의 변경사항을 알려주는 콜백 함수
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        base.OnRoomListUpdate(roomList);
+
+        foreach(RoomInfo room in roomList)
+        {
+            // 만일, 갱신된 룸 정보가 제거 리스트에 있다면...
+            if (room.RemovedFromList)
+            {
+                // cachedRoomList에서 해당 룸을 제거한다.
+                cachedRoomList.Remove(room);
+            }
+            // 그렇지 않다면...
+            else
+            {
+                // 만일, 이미 cachedRoomList에 있는 방이라면...
+                if (cachedRoomList.Contains(room))
+                {
+                    // 기존 룸 정보를 제거한다.
+                    cachedRoomList.Remove(room);
+                }
+                // 새 룸을 cachedRoomList에 추가한다.
+                cachedRoomList.Add(room);
+            }
+        }
+
+        foreach(RoomInfo room in cachedRoomList)
+        {
+            string text = $"Room Name: {room.Name}, Player Limit: {room.MaxPlayers}. Current Player Count: {room.PlayerCount}";
+            print(text);
+            LobbyUIController.lobbyUI.PrintLog(text);
+        }
+    }
+
 }
