@@ -10,6 +10,11 @@ public class GameManager : MonoBehaviourPun
     void Start()
     {
         StartCoroutine(SpawnPlayer());
+
+        // OnPhotonSerializeView 에서 데이터 전송 빈도 수 설정하기(per seconds)
+        PhotonNetwork.SerializationRate = 30;
+        // 대부분의 데이터 전송 빈도 수 설정하기(per seconds)
+        PhotonNetwork.SendRate = 30;
     }
 
     IEnumerator SpawnPlayer()
@@ -20,7 +25,9 @@ public class GameManager : MonoBehaviourPun
         Vector2 randomPos = Random.insideUnitCircle * 5.0f;
         Vector3 initPosition = new Vector3(randomPos.x, 1.0f, randomPos.y);
 
-        PhotonNetwork.Instantiate("Player", initPosition, Quaternion.identity);
+        GameObject player = PhotonNetwork.Instantiate("Player", initPosition, Quaternion.identity);
+
+
     }
 
     void Update()

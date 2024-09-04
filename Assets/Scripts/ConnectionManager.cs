@@ -5,9 +5,16 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Reflection;
 using System;
+using ExitGames.Client.Photon;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+
 
 public class ConnectionManager : MonoBehaviourPunCallbacks
 {
+    public GameObject roomPrefab;
+    public Transform scrollContent;
+    public GameObject[] panelList;
+
     List<RoomInfo> cachedRoomList = new List<RoomInfo>();
 
     void Start()
@@ -85,18 +92,35 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
             roomOpt.IsOpen = true;
             roomOpt.IsVisible = true;
 
+            // 룸의 커스텀 정보를 추가한다.
+            // 키 값 등록하기
+            roomOpt.CustomRoomPropertiesForLobby = new string[] { "MASTER_NAME", "PASSWORD"};
+            
+            // 키에 맞는 해시 테이블 추가하기
+            Hashtable roomTable = new Hashtable();
+            roomTable.Add("MASTER_NAME", PhotonNetwork.NickName);
+            roomTable.Add("PASSWORD", 1234);
+            roomOpt.CustomRoomProperties = roomTable;
+
             PhotonNetwork.CreateRoom(roomName, roomOpt, TypedLobby.Default);
         }
     }
 
     public void JoinRoom()
     {
-        string roomName = LobbyUIController.lobbyUI.roomSetting[0].text;
+        // Join 관련 패널을 활성화한다.
+        ChangePanel(1, 2);
+    }
 
-        if (roomName.Length > 0)
-        {
-            PhotonNetwork.JoinRoom(roomName);
-        }
+    /// <summary>
+    /// 패널의 변경을 하기 위한 함수
+    /// </summary>
+    /// <param name="offIndex">꺼야될 패널 인덱스</param>
+    /// <param name="onIndex">켜야될 패널 인덱스</param>
+    void ChangePanel(int offIndex, int onIndex)
+    {
+        panelList[offIndex].SetActive(false);
+        panelList[onIndex].SetActive(true);
     }
 
     public override void OnCreatedRoom()
@@ -127,6 +151,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
         // 룸에 입장이 실패한 이유를 출력한다.
         Debug.LogError(message);
         LobbyUIController.lobbyUI.PrintLog("입장 실패..." + message);
+        
     }
 
     // 룸에 다른 플레이어가 입장했을 때의 콜백 함수
@@ -174,11 +199,23 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
             }
         }
 
+        // 기존의 모든 방 정보를 삭제한다.
+        for(int i=0; i< scrollContent.childCount; i++)
+        {
+            Destroy(scrollContent.GetChild(i).gameObject);
+        }
+
         foreach(RoomInfo room in cachedRoomList)
         {
-            string text = $"Room Name: {room.Name}, Player Limit: {room.MaxPlayers}. Current Player Count: {room.PlayerCount}";
-            print(text);
-            LobbyUIController.lobbyUI.PrintLog(text);
+            // cachedRoomList에 있는 모든 방을 만들어서 스크롤뷰에 추가한다.
+            GameObject go = Instantiate(roomPrefab, scrollContent);
+            RoomPanel roomPanel = go.GetComponent<RoomPanel>();
+            roomPanel.SetRoomInfo(room);
+            // 버튼에 방 입장 기능 연결하기
+            roomPanel.btn_join.onClick.AddListener(() =>
+            {
+                PhotonNetwork.JoinRoom(room.Name);
+            });
         }
     }
 
