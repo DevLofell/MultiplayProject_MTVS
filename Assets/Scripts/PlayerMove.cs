@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerMove : PlayerStateBase, IPunObservable
 {
@@ -13,8 +14,11 @@ public class PlayerMove : PlayerStateBase, IPunObservable
     PhotonView pv;
     Vector3 myPos;
     Quaternion myRot;
+    Vector3 myPrevPos;
 
     float mx = 0;
+    //float h, v = 0;
+    //float prevH, prevV = 0;
 
     void Start()
     {
@@ -22,6 +26,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable
         cc = GetComponent<CharacterController>();
         myAnim = GetComponentInChildren<Animator>();
         pv = GetComponent<PhotonView>();
+        myPrevPos = transform.position;
     }
 
     void Update()
@@ -53,7 +58,33 @@ public class PlayerMove : PlayerStateBase, IPunObservable
         }
         else
         {
-            transform.position = Vector3.Lerp(transform.position, myPos, Time.deltaTime * trackingSpeed);
+            Vector3 targetPos = Vector3.Lerp(transform.position, myPos, Time.deltaTime * trackingSpeed);
+
+            float dist = (targetPos - myPrevPos).magnitude;
+            transform.position = dist > 0.01f ? targetPos : myPos;
+            //Vector2 animPos = dist > 0.01f ? Vector2.one : Vector2.zero;
+
+            Vector3 localDir = transform.InverseTransformDirection(targetPos - myPrevPos);
+
+            float deltaX = localDir.x;
+            float deltaZ = localDir.z;
+
+            float newX = 0;
+            float newZ = 0;
+            if(Mathf.Abs(deltaX) > 0.01f)
+            {
+               newX  = deltaX > 0 ? 1.0f : -1.0f;
+            }
+
+            if (Mathf.Abs(deltaZ) > 0.01f)
+            {
+                newZ = deltaZ > 0 ? 1.0f : -1.0f;
+            }
+            
+            myPrevPos = transform.position;
+            myAnim.SetFloat("Horizontal", newX);
+            myAnim.SetFloat("Vertical", newZ);
+
         }
     }
 
@@ -81,12 +112,16 @@ public class PlayerMove : PlayerStateBase, IPunObservable
             // iterable 데이터를 보낸다.
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
+            //stream.SendNext(new Vector2(h, v));
         }
-        // 그렇지 않고, 만일 데이터를 서버로부터 읽어어는 상태라면...
+        // 그렇지 않고, 만일 데이터를 서버로부터 읽어오는 상태라면...
         else if(stream.IsReading)
         {
             myPos = (Vector3)stream.ReceiveNext();
             myRot = (Quaternion)stream.ReceiveNext();
+            //Vector2 inputValue = (Vector2)stream.ReceiveNext();
+            //h = inputValue.x;
+            //v = inputValue.y;
         }
     }
 }

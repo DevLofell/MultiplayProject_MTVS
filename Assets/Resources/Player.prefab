@@ -542,6 +542,7 @@ MonoBehaviour:
   moveSpeed: 7
   rotSpeed: 300
   maxHealth: 100
+  trackingSpeed: 30
 --- !u!114 &3226330709246555138
 MonoBehaviour:
   m_ObjectHideFlags: 0
