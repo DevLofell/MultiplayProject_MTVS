@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviourPun
 
         GameObject player = PhotonNetwork.Instantiate("Player", initPosition, Quaternion.identity);
 
-
+      
     }
 
     void Update()

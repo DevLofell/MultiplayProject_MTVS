@@ -31,16 +31,34 @@ public class WeaponData : MonoBehaviourPun, IPunObservable
         {
             PlayerFire pf = other.transform.GetComponent<PlayerFire>();
             transform.parent = pf.sockets[(int)weaponInfo.weaponType].transform;
-            transform.localPosition = Vector3.zero;
-            transform.localRotation = Quaternion.identity;
-            transform.GetComponent<BoxCollider>().enabled = false;
-            photonView.TransferOwnership(pv.ViewID);
+            // 충돌체 비활성화하기
+            photonView.RPC("SwitchEnabledCollider", RpcTarget.All, false);
+            
+            // 자신의 네트워크 소유권을 충돌한 플레이어에게 이전한다.
+            photonView.TransferOwnership(pv.Owner);
+            StartCoroutine(ResetPosition());
 
             // RPC 함수를 호출하도록 요청한다.
             pf.RPC_GetWeapon(weaponInfo.ammo, weaponInfo.attakPower, weaponInfo.range, (int)weaponInfo.weaponType);
             
         }
     }
+
+    [PunRPC]
+    void SwitchEnabledCollider(bool onOff)
+    {
+        transform.GetComponent<BoxCollider>().enabled = onOff;
+    }
+
+    IEnumerator ResetPosition()
+    {
+        // 소유권이 있어서 isMine이 될 때까지 대기한다.
+        yield return new WaitUntil(() => { return photonView.IsMine; });
+
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+    }
+
 
     public void DropWeapon(WeaponInfo currentInfo)
     {
@@ -60,7 +78,7 @@ public class WeaponData : MonoBehaviourPun, IPunObservable
     IEnumerator TriggerOn(float time)
     {
         yield return new WaitForSeconds(time);
-        transform.GetComponent<BoxCollider>().enabled = true;
+        photonView.RPC("SwitchEnabledCollider", RpcTarget.All, true);
         weaponCoroutine = null;
     }
 
