@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using Photon.Voice.PUN;
+using UnityEngine.UI;
 
 public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
 {
     public float trackingSpeed = 3;
     public PlayerUI healthUI;
     public Vector3 shakePower;
+    public RawImage voiceIcon;
 
     Transform cam;
     CharacterController cc;
@@ -19,6 +22,8 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
     Quaternion myRot;
     Vector3 myPrevPos;
     bool isShaking = false;
+    PhotonVoiceView voiceView;
+    bool isTalking = false;
 
     float mx = 0;
     //float h, v = 0;
@@ -31,6 +36,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
         myAnim = GetComponentInChildren<Animator>();
         pv = GetComponent<PhotonView>();
         myPrevPos = transform.position;
+        voiceView = GetComponent<PhotonVoiceView>();
 
         // 현재 체력을 초기화한다.
         currentHealth = maxHealth;
@@ -47,6 +53,16 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
         {
             Move();
             Rotate();
+        }
+
+        // 현재 말을 하고 있다면 보이스 아이콘을 활성화한다.
+        if (pv.IsMine)
+        {
+            voiceIcon.gameObject.SetActive(voiceView.IsRecording);
+        }
+        else
+        {
+            voiceIcon.gameObject.SetActive(isTalking);
         }
 
         #region 디버깅용
@@ -135,6 +151,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
             //stream.SendNext(new Vector2(h, v));
+            stream.SendNext(voiceView.IsRecording);
         }
         // 그렇지 않고, 만일 데이터를 서버로부터 읽어오는 상태라면...
         else if(stream.IsReading)
@@ -144,6 +161,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
             //Vector2 inputValue = (Vector2)stream.ReceiveNext();
             //h = inputValue.x;
             //v = inputValue.y;
+            isTalking = (bool)stream.ReceiveNext();
         }
     }
 
