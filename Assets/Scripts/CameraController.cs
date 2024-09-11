@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class CameraController : MonoBehaviour
     Vector3 minLocalPos;
     Vector3 maxLocalPos;
     float my;
+    int currentSceneNumber = 0;
 
     void Start()
     {
@@ -25,12 +27,19 @@ public class CameraController : MonoBehaviour
         // farPos의 위치를 nearPos의 위치로부터 farOffset만큼 떨어지도록 조정한다.
         Vector3 camDir = farOffset.normalized * distance;
         maxLocalPos = minLocalPos + camDir;
+        SetMyCamera();
 
+        currentSceneNumber = SceneManager.GetActiveScene().buildIndex;
+    }
+
+    void SetMyCamera()
+    {
         // 만일, 이 캐릭터가 캐릭터의 소유권자라면...
         // 메인 카메라의 CameraFollow 컴포넌트에서 follow Target과 LookAt Target을 모두 farPos로 지정한다.
         if (GetComponent<PhotonView>().IsMine)
         {
             followCam = Camera.main.transform.GetComponent<CameraFollow>();
+            print(followCam.name);
             followCam.SetCameraFollowTarget(basePositions[1]);
             followCam.SetCameraLookAtTarget(basePositions[1]);
         }
@@ -39,6 +48,15 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        if(currentSceneNumber != SceneManager.GetActiveScene().buildIndex)
+        {
+            SetMyCamera();
+            Cursor.lockState = CursorLockMode.Locked;
+            UIManager.main_ui.SetWeaponInfo(new WeaponInfo());
+            currentSceneNumber = SceneManager.GetActiveScene().buildIndex;
+        }
+
+
         basePositions[1].localPosition = SetCameraPosition();
         basePositions[1].localEulerAngles = SetCameraRotation();
 

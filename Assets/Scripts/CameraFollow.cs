@@ -51,5 +51,6 @@ public class CameraFollow : MonoBehaviour
     public void SetCameraFollowTarget(Transform target)
     {
         followTarget = target;
+        print("FollowTarget: " + target.name);
     }
 }

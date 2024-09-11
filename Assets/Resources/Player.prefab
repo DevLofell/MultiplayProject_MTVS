@@ -212,7 +212,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 8138655061006680562}
   m_HandleRect: {fileID: 0}
@@ -881,6 +881,7 @@ GameObject:
   - component: {fileID: 6627840427895007106}
   - component: {fileID: 5176420840361452506}
   - component: {fileID: -4791368953482102619}
+  - component: {fileID: -923439501331554912}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -1085,6 +1086,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3780797086001459857}
+  - {fileID: 3226330709246555138}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1212,6 +1214,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 126494ae2a10a34499272ed97a6c9f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-923439501331554912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7339084293384779176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a2e72a5bdea774bbd72affb41bf8c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7538411300076619030

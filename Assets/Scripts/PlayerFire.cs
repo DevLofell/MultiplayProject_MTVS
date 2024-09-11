@@ -2,19 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
-public class PlayerFire : MonoBehaviourPun
+public class PlayerFire : MonoBehaviourPun, IPunObservable
 {
     public Transform[] sockets;
     public WeaponInfo myWeapon;
     public Animator anim;
 
     PlayerUI playerUI;
+    int weaponNumber = -1;
 
     void Start()
     {
         myWeapon.weaponType = WeaponType.None;
-        UIManager.main_ui.SetWeaponInfo(myWeapon);
+        if (SceneManager.GetActiveScene().buildIndex == 2)
+        {
+            UIManager.main_ui.SetWeaponInfo(myWeapon);
+        }
 
         playerUI = GetComponentInChildren<PlayerUI>();
 
@@ -30,7 +35,7 @@ public class PlayerFire : MonoBehaviourPun
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && myWeapon.weaponType != WeaponType.None)
+        if (Input.GetMouseButtonDown(0) && photonView.IsMine && myWeapon.weaponType != WeaponType.None)
         {
             Fire();
         }
@@ -79,7 +84,7 @@ public class PlayerFire : MonoBehaviourPun
             data.DropWeapon(myWeapon);
         }
 
-        photonView.RPC("DropMyWeapon", RpcTarget.All);
+        photonView.RPC("DropMyWeapon", RpcTarget.AllBuffered);
     }
 
 
@@ -87,8 +92,11 @@ public class PlayerFire : MonoBehaviourPun
     void DropMyWeapon()
     {
         // 무기 상태(myWeapon 변수)를 초기화한다.
-        myWeapon = new WeaponInfo();
-        UIManager.main_ui.SetWeaponInfo(myWeapon);
+        if (photonView.IsMine)
+        {
+            myWeapon = new WeaponInfo();
+            UIManager.main_ui.SetWeaponInfo(myWeapon);
+        }
 
         anim.SetBool("GetPistol", false);
         anim.SetBool("GetRifle", false);
@@ -96,7 +104,7 @@ public class PlayerFire : MonoBehaviourPun
 
     public void RPC_GetWeapon(int ammo, float atkPower, float range, int weaponType)
     {
-        photonView.RPC("GetWeapon", RpcTarget.All, ammo, atkPower, range, weaponType);
+        photonView.RPC("GetWeapon", RpcTarget.AllBuffered, ammo, atkPower, range, weaponType);
     }
 
 
@@ -109,19 +117,47 @@ public class PlayerFire : MonoBehaviourPun
         // - 자신의 박스 컴포넌트를 비활성화한다.
         // - 무기 정보를 플레이어에게 전달한다.
 
-
         myWeapon.SetInformation(ammo, atkPower, range, (WeaponType)weaponType);
 
-        UIManager.main_ui.SetWeaponInfo(myWeapon);
-        if (myWeapon.weaponType == WeaponType.PistolType)
+        if (photonView.IsMine)
         {
-            anim.SetBool("GetPistol", true);
-            anim.SetBool("GetRifle", false);
+            UIManager.main_ui.SetWeaponInfo(myWeapon);
+
+            if (myWeapon.weaponType == WeaponType.PistolType)
+            {
+                anim.SetBool("GetPistol", true);
+                anim.SetBool("GetRifle", false);
+            }
+            else if (myWeapon.weaponType == WeaponType.RifleType)
+            {
+                anim.SetBool("GetRifle", true);
+                anim.SetBool("GetPistol", false);
+            }
         }
-        else if (myWeapon.weaponType == WeaponType.RifleType)
+        else
         {
-            anim.SetBool("GetRifle", true);
-            anim.SetBool("GetPistol", false);
+            if (weaponType == 0)
+            {
+                anim.SetBool("GetPistol", true);
+                anim.SetBool("GetRifle", false);
+            }
+            else if (weaponType == 1)
+            {
+                anim.SetBool("GetRifle", true);
+                anim.SetBool("GetPistol", false);
+            }
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext((int)myWeapon.weaponType);
+        }
+        else if (stream.IsReading)
+        {
+            weaponNumber = (int)stream.ReceiveNext();
         }
     }
 }

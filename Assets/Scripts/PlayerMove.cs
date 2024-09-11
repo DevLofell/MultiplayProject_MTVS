@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using Photon.Voice.PUN;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
 {
@@ -24,6 +25,8 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
     bool isShaking = false;
     PhotonVoiceView voiceView;
     bool isTalking = false;
+    float hpSync = 0;
+    bool requestLoadLevel = false;
 
     float mx = 0;
     //float h, v = 0;
@@ -55,14 +58,28 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
             Rotate();
         }
 
-        // 현재 말을 하고 있다면 보이스 아이콘을 활성화한다.
+        
         if (pv.IsMine)
         {
+            // 현재 말을 하고 있다면 보이스 아이콘을 활성화한다.
             voiceIcon.gameObject.SetActive(voiceView.IsRecording);
+
         }
         else
         {
             voiceIcon.gameObject.SetActive(isTalking);
+
+            // 현재 체력을 동기화한다.
+            if (currentHealth != hpSync)
+            {
+                currentHealth = hpSync;
+                healthUI.SetHPValue(currentHealth, maxHealth);
+            }
+        }
+
+        if(!requestLoadLevel && SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            StartCoroutine(GoMainScene());
         }
 
         #region 디버깅용
@@ -152,6 +169,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
             stream.SendNext(transform.rotation);
             //stream.SendNext(new Vector2(h, v));
             stream.SendNext(voiceView.IsRecording);
+            stream.SendNext(currentHealth);
         }
         // 그렇지 않고, 만일 데이터를 서버로부터 읽어오는 상태라면...
         else if(stream.IsReading)
@@ -162,12 +180,13 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
             //h = inputValue.x;
             //v = inputValue.y;
             isTalking = (bool)stream.ReceiveNext();
+            hpSync = (float)stream.ReceiveNext();
         }
     }
 
     public void RPC_TakeDamage(float dmg, int viewID)
     {
-        pv.RPC("TakeDamage", RpcTarget.All, dmg, viewID);
+        pv.RPC("TakeDamage", RpcTarget.AllBuffered, dmg, viewID);
     }
 
     [PunRPC]
@@ -242,6 +261,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
             ColorAdjustments postColor;
             currentVolume.profile.TryGet<ColorAdjustments>(out postColor);
             postColor.saturation.value = -10000;
+            Cursor.lockState = CursorLockMode.None;
         }
 
         // 죽음 애니메이션을 실행한다.
@@ -251,5 +271,25 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
         // 움직임을 죽음 상태로 전환한다.
         playerState = PlayerState.DIE;
         // 애니메이션이 끝나면 플레이어를 제거한다.
+
+        if (pv.IsMine)
+        {
+            UIManager.main_ui.btn_leave.gameObject.SetActive(true);
+        }
+    }
+
+
+    IEnumerator GoMainScene()
+    {
+        int currentPlayers = PhotonNetwork.CurrentRoom.PlayerCount;
+        int maxPlayers = PhotonNetwork.CurrentRoom.MaxPlayers;
+        
+        if (PhotonNetwork.IsMasterClient && pv.IsMine && currentPlayers == maxPlayers)
+        {
+            requestLoadLevel = true;
+            yield return new WaitForSeconds(2.0f);
+
+            PhotonNetwork.LoadLevel(2);
+        }
     }
 }

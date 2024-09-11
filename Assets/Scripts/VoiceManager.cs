@@ -11,6 +11,8 @@ public class VoiceManager : MonoBehaviourPun
     void Start()
     {
         recorder = GetComponent<Recorder>();
+
+        recorder.TransmitEnabled = false;
     }
 
     void Update()
