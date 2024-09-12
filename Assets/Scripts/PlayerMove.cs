@@ -7,6 +7,7 @@ using UnityEngine.Rendering.Universal;
 using Photon.Voice.PUN;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
 {
@@ -52,7 +53,9 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
 
     void Update()
     {
-        if (playerState == PlayerState.RUN)
+        print("UI Select - " + EventSystem.current.currentSelectedGameObject);
+
+        if (playerState == PlayerState.RUN && !EventSystem.current.alreadySelecting)
         {
             Move();
             Rotate();
