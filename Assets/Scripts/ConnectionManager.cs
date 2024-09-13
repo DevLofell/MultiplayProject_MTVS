@@ -36,6 +36,8 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
             PhotonNetwork.NickName = LobbyUIController.lobbyUI.input_nickName.text;
             PhotonNetwork.AutomaticallySyncScene = true;
 
+            // 플레이어 캐릭터 바디 머티리얼 색상 선택
+
             // 접속을 서버에 요청하기
             PhotonNetwork.ConnectUsingSettings();
             LobbyUIController.lobbyUI.btn_login.interactable = false;
@@ -93,6 +95,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
             roomOpt.IsVisible = true;
 
             // 룸의 커스텀 정보를 추가한다.
+            // - 선택한 맵 번호를 룸 정보에 추가한다.
             // 키 값 등록하기
             roomOpt.CustomRoomPropertiesForLobby = new string[] { "MASTER_NAME", "PASSWORD"};
             
@@ -103,6 +106,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
             roomOpt.CustomRoomProperties = roomTable;
 
             PhotonNetwork.CreateRoom(roomName, roomOpt, TypedLobby.Default);
+            
         }
     }
 
@@ -141,6 +145,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
         LobbyUIController.lobbyUI.PrintLog("방에 입장 성공!");
 
         // 방에 입장한 친구들은 모두 1번 씬으로 이동하자!
+       
         PhotonNetwork.LoadLevel(1);
     }
 

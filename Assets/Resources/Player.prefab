@@ -1064,7 +1064,7 @@ MonoBehaviour:
     ammo: 0
     attakPower: 0
     range: 0
-    weaponType: 0
+    weaponType: -1
   anim: {fileID: 2762800988585434004}
 --- !u!114 &6388532224162510795
 MonoBehaviour:
@@ -1589,6 +1589,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1602814562895404597, guid: 9e1731dd636f6874eb5a9435655f8273,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: bb59375e3408cc3479ac7726fbf75439, type: 2}
     - target: {fileID: -1602814562895404597, guid: 9e1731dd636f6874eb5a9435655f8273,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.size

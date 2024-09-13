@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.IO;
 
 public class CameraFollow : MonoBehaviour
 {
@@ -40,6 +42,14 @@ public class CameraFollow : MonoBehaviour
             //Vector3 dir = lookAtTarget.position - transform.position;
             //transform.forward = dir;
             transform.rotation = lookAtTarget.rotation;
+        }
+
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            string now = DateTime.Now.ToString();
+            now = now.Replace(":", "-");
+
+            ScreenCapture.CaptureScreenshot(Path.Combine(Application.dataPath, now + ".png"));
         }
     }
 

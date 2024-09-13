@@ -53,9 +53,7 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
 
     void Update()
     {
-        print("UI Select - " + EventSystem.current.currentSelectedGameObject);
-
-        if (playerState == PlayerState.RUN && !EventSystem.current.alreadySelecting)
+        if (playerState == PlayerState.RUN && EventSystem.current.currentSelectedGameObject == null)
         {
             Move();
             Rotate();
@@ -291,7 +289,8 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
         {
             requestLoadLevel = true;
             yield return new WaitForSeconds(2.0f);
-
+            
+            // 방에 설정된 맵 번호에 맞는 씬으로 이동하기
             PhotonNetwork.LoadLevel(2);
         }
     }
