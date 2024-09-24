@@ -552,7 +552,7 @@ GameObject:
   - component: {fileID: 6660508558345836437}
   - component: {fileID: 7088015668249084194}
   m_Layer: 5
-  m_Name: text_MapName
+  m_Name: img_MapName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -740,6 +740,10 @@ MonoBehaviour:
   - {fileID: 7865953127500825014}
   - {fileID: 433847442350961105}
   btn_join: {fileID: 3783806378454643573}
+  img_MapImg: {fileID: 7088015668249084194}
+  mapSprites:
+  - {fileID: 21300000, guid: 9fa45a9200570e24e980b2aa0e3c68a7, type: 3}
+  - {fileID: 21300000, guid: afed6f459e6f5bb4fbdadbd07935a893, type: 3}
 --- !u!1 &9046525603336231087
 GameObject:
   m_ObjectHideFlags: 0

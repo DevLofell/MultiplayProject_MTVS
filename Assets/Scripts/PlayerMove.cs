@@ -289,9 +289,11 @@ public class PlayerMove : PlayerStateBase, IPunObservable, IInteractionInterface
         {
             requestLoadLevel = true;
             yield return new WaitForSeconds(2.0f);
-            
+
             // 방에 설정된 맵 번호에 맞는 씬으로 이동하기
-            PhotonNetwork.LoadLevel(2);
+            ExitGames.Client.Photon.Hashtable roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+            int sceneNum = (int)roomProps["SCENE_NUMBER"];
+            PhotonNetwork.LoadLevel(sceneNum);
         }
     }
 }

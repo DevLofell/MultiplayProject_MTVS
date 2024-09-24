@@ -882,6 +882,7 @@ GameObject:
   - component: {fileID: 5176420840361452506}
   - component: {fileID: -4791368953482102619}
   - component: {fileID: -923439501331554912}
+  - component: {fileID: 51172886844755243}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -1228,6 +1229,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70a2e72a5bdea774bbd72affb41bf8c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &51172886844755243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7339084293384779176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbf4d5ef4ea5d064191c1441137a0a2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mr: {fileID: 2232745071683356622}
+  characterMaterials:
+  - {fileID: 2100000, guid: ae4ba8754021f1544951a56bd4f92131, type: 2}
+  - {fileID: 2100000, guid: 541be9eb58384dd4ca56287c83089537, type: 2}
+  - {fileID: 2100000, guid: bb59375e3408cc3479ac7726fbf75439, type: 2}
 --- !u!1 &7538411300076619030
 GameObject:
   m_ObjectHideFlags: 0
@@ -1644,6 +1662,12 @@ Transform:
 --- !u!4 &1320569070290437255 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7308919876162986626, guid: 9e1731dd636f6874eb5a9435655f8273,
+    type: 3}
+  m_PrefabInstance: {fileID: 8592275957157144069}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &2232745071683356622 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1602814562895404597, guid: 9e1731dd636f6874eb5a9435655f8273,
     type: 3}
   m_PrefabInstance: {fileID: 8592275957157144069}
   m_PrefabAsset: {fileID: 0}

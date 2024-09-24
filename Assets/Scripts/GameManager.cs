@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     public TMP_Text text_playerList;
     public static GameManager gm;
     public GameObject myPlayer;
+   
+
+    string[] characterName = new string[3] { "Player_Red", "Player_Green", "Player_Blue" };
 
     private void Awake()
     {
@@ -46,7 +49,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         Vector2 randomPos = Random.insideUnitCircle * 5.0f;
         Vector3 initPosition = new Vector3(randomPos.x, 1.0f, randomPos.y);
 
+        // 1. 프리팹 번호로 불러오기
+        //int playerNum = (int)PhotonNetwork.LocalPlayer.CustomProperties["CHARACTER_COLOR"];
+        //myPlayer = PhotonNetwork.Instantiate(characterName[playerNum], initPosition, Quaternion.identity);
+
+        // 2. 머티리얼만 바꾸기
+        int matNumber = (int)PhotonNetwork.LocalPlayer.CustomProperties["CHARACTER_COLOR"];
         myPlayer = PhotonNetwork.Instantiate("Player", initPosition, Quaternion.identity);
+        myPlayer.GetComponent<PlayerSetter>().SetBodyColor(matNumber);
     }
 
     void Update()

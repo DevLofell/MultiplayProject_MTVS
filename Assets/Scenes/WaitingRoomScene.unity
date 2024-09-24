@@ -1075,6 +1075,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text_playerList: {fileID: 0}
   myPlayer: {fileID: 0}
+  characterMaterials:
+  - {fileID: 2100000, guid: ae4ba8754021f1544951a56bd4f92131, type: 2}
+  - {fileID: 2100000, guid: 541be9eb58384dd4ca56287c83089537, type: 2}
+  - {fileID: 2100000, guid: bb59375e3408cc3479ac7726fbf75439, type: 2}
 --- !u!4 &2016275279
 Transform:
   m_ObjectHideFlags: 0
